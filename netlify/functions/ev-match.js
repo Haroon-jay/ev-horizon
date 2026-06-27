@@ -117,7 +117,7 @@ Respond with valid JSON only — no markdown, no explanation outside the JSON, n
       return {
         statusCode: 502,
         headers: corsHeaders(),
-        body: JSON.stringify({ error: 'AI service error. Please try again.', upstream_status: response.status, upstream: err }),
+        body: JSON.stringify({ error: 'AI service error. Please try again.' }),
       };
     }
 
