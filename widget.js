@@ -174,6 +174,9 @@
     var MODEL     = cfg.model     || '';
     var LOGO      = cfg.logo      || '';          // URL or data URL
     var WEBHOOK   = cfg.webhook   || '';
+    // Absolute URL so the AI match works when embedded on a dealer's own domain.
+    // Override with data-endpoint if the function is hosted elsewhere.
+    var ENDPOINT  = cfg.endpoint  || 'https://evhorizon.netlify.app/.netlify/functions/ev-match';
     var CTA       = cfg.cta       || 'Get a Personalised Quote';
     var SHOW_LEAD = cfg.showLead !== false;       // default: true
     var TARGET    = cfg.target    || 'ev-savings-widget';
@@ -425,7 +428,7 @@
       var monthEl = q('.evhw-r-month');
       var yearEl  = q('.evhw-r-year');
 
-      fetch('/.netlify/functions/ev-match', {
+      fetch(ENDPOINT, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -523,6 +526,7 @@
     model:    attr('model',  ''),
     logo:     attr('logo',   ''),
     webhook:  attr('webhook',''),
+    endpoint: attr('endpoint',''),
     cta:      attr('cta',   'Get a Personalised Quote'),
     showLead: attr('show-lead', 'true') !== 'false',
     target:   attr('target','ev-savings-widget'),
