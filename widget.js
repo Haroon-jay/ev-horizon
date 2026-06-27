@@ -158,7 +158,7 @@
 
   var DEFAULTS = {
     km: { dist: 1500, fuel: 7.5,  fprice: 1.60, eveff: 17,  eprice: 0.15 },
-    mi: { dist: 900,  fuel: 31,   fprice: 3.60, eveff: 3.8, eprice: 0.15 },
+    mi: { dist: 1500, fuel: 22,   fprice: 3.60, eveff: 3.8, eprice: 0.15 },
   };
   var LABELS = {
     km: { dist:'Monthly Distance (km)', fuel:'Fuel Use (L/100 km)', fprice:'Fuel Price ($/L)',   eveff:'EV Efficiency (kWh/100 km)' },
