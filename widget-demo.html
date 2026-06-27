@@ -390,7 +390,7 @@
   <!-- Top bar -->
   <div class="topbar">
     <div class="topbar-left">
-      <div class="logo">
+      <a href="/" class="logo" style="text-decoration:none;color:var(--text)" title="Back to home">
         <svg width="20" height="20" viewBox="0 0 32 32" fill="none">
           <circle cx="16" cy="16" r="14.5" stroke="#00D4FF" stroke-width="2"/>
           <path d="M5 19h22" stroke="#7CFF6B" stroke-width="2" stroke-linecap="round"/>
@@ -398,7 +398,7 @@
           <path d="M14.2 10.2L17 13l-2.4 1.4 3.2 3.2" stroke="#F5F7FA" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
         <span><span class="logo-ev">EV</span> Horizon Widget</span>
-      </div>
+      </a>
       <span class="badge">Live Configurator</span>
     </div>
     <span class="topbar-hint">← Adjust settings, see changes instantly</span>
@@ -475,8 +475,7 @@
       <div class="setting-group">
         <div class="group-label">AI EV Match</div>
         <div style="font-size:12px;color:var(--muted);line-height:1.6;margin-bottom:12px">
-          The <strong style="color:var(--text)">✨ Find My Best EV Match</strong> button calls a Netlify serverless function → Claude AI → returns personalised EV recommendations.<br><br>
-          To test locally, set <code style="background:#111622;color:#00D4FF;padding:1px 5px;border-radius:3px;font-size:11px">ANTHROPIC_API_KEY</code> in Netlify environment variables. On this demo page it shows the live button — on deploy it will call the real function.
+          The <strong style="color:var(--text)">✨ Find My Best EV Match</strong> button uses AI to recommend the 3 best EVs for each visitor — a top pick plus two alternatives — matched to their driving profile and savings, with payback periods and reasoning. It's the differentiator a static calculator can't offer.
         </div>
         <div style="background:#7CFF6B12;border:1px solid #7CFF6B30;border-radius:8px;padding:10px 12px;font-size:12px;color:#7CFF6B">
           ✓ Lead payload now includes <strong>ai_recommended</strong> field — dealers see which EV the AI matched before the customer submitted.
