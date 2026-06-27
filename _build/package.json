@@ -1,0 +1,8 @@
+{
+  "name": "ev-horizon-build",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node generate.js"
+  }
+}

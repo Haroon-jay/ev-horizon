@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EV Savings Widget — Live Configurator</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0 }
+    :root {
+      --bg: #05070A;
+      --bg2: #0e1219;
+      --bg3: #111622;
+      --border: #1e2430;
+      --text: #f0f2f5;
+      --muted: #8892a4;
+      --blue: #00D4FF;
+      --green: #7CFF6B;
+    }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      min-height: 100vh;
+    }
+
+    /* ── Scrollbars ── */
+    ::-webkit-scrollbar { width: 6px; height: 6px }
+    ::-webkit-scrollbar-track { background: transparent }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 99px }
+    ::-webkit-scrollbar-thumb:hover { background: #2e3a4e }
+    * { scrollbar-width: thin; scrollbar-color: var(--border) transparent }
+
+    /* ── Top bar ── */
+    .topbar {
+      background: var(--bg2);
+      border-bottom: 1px solid var(--border);
+      padding: 14px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+    .topbar-left { display: flex; align-items: center; gap: 12px }
+    .logo { display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 16px }
+    .logo-ev { color: var(--blue) }
+    .badge {
+      background: var(--blue)20;
+      border: 1px solid var(--blue)50;
+      color: var(--blue);
+      font-size: 11px;
+      font-weight: 600;
+      padding: 3px 10px;
+      border-radius: 99px;
+    }
+    .topbar-hint { font-size: 13px; color: var(--muted) }
+    .btn-copy {
+      background: var(--blue);
+      color: #000;
+      border: none;
+      border-radius: 8px;
+      padding: 9px 18px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: opacity .15s;
+      white-space: nowrap;
+    }
+    .btn-copy:hover { opacity: .85 }
+
+    /* ── Main layout ── */
+    .layout {
+      display: grid;
+      grid-template-columns: 320px 1fr;
+      min-height: calc(100vh - 53px);
+    }
+
+    /* ── Settings panel ── */
+    .settings {
+      background: var(--bg2);
+      border-right: 1px solid var(--border);
+      padding: 24px;
+      overflow-y: auto;
+      max-height: calc(100vh - 53px);
+      position: sticky;
+      top: 53px;
+    }
+    .settings-title {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: .8px;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 20px;
+    }
+    .setting-group {
+      margin-bottom: 24px;
+      padding-bottom: 24px;
+      border-bottom: 1px solid var(--border);
+    }
+    .setting-group:last-child { border-bottom: none; margin-bottom: 0 }
+    .group-label {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--blue);
+      letter-spacing: .5px;
+      text-transform: uppercase;
+      margin-bottom: 14px;
+    }
+    .field { margin-bottom: 14px }
+    .field:last-child { margin-bottom: 0 }
+    label.lbl {
+      display: block;
+      font-size: 12px;
+      color: var(--muted);
+      font-weight: 500;
+      margin-bottom: 6px;
+    }
+    input[type=text],
+    input[type=url] {
+      width: 100%;
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 9px 12px;
+      color: var(--text);
+      font-size: 13px;
+      outline: none;
+      transition: border-color .15s;
+      font-family: inherit;
+    }
+    input[type=text]:focus,
+    input[type=url]:focus { border-color: var(--blue) }
+
+    /* Color picker row */
+    .color-row { display: flex; gap: 8px; align-items: center }
+    input[type=color] {
+      width: 40px;
+      height: 36px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--bg3);
+      cursor: pointer;
+      padding: 2px;
+      flex-shrink: 0;
+    }
+    .color-hex {
+      flex: 1;
+      font-family: 'Courier New', monospace;
+      font-size: 13px;
+    }
+    .color-presets {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin-top: 8px;
+    }
+    .preset-swatch {
+      width: 26px;
+      height: 26px;
+      border-radius: 6px;
+      border: 2px solid transparent;
+      cursor: pointer;
+      transition: transform .1s, border-color .1s;
+      flex-shrink: 0;
+    }
+    .preset-swatch:hover { transform: scale(1.15) }
+    .preset-swatch.active { border-color: #fff }
+
+    /* Unit toggle */
+    .unit-toggle { display: flex; gap: 6px }
+    .unit-btn {
+      flex: 1;
+      padding: 8px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all .15s;
+      font-family: inherit;
+    }
+    .unit-btn.active {
+      background: var(--blue)20;
+      border-color: var(--blue);
+      color: var(--blue);
+    }
+
+    /* Toggle switch */
+    .toggle-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .toggle-label { font-size: 13px; color: var(--text) }
+    .toggle-sub { font-size: 11px; color: var(--muted); margin-top: 2px }
+    .switch {
+      position: relative;
+      width: 40px;
+      height: 22px;
+      flex-shrink: 0;
+    }
+    .switch input { opacity: 0; width: 0; height: 0 }
+    .slider {
+      position: absolute;
+      inset: 0;
+      background: var(--border);
+      border-radius: 99px;
+      cursor: pointer;
+      transition: background .2s;
+    }
+    .slider::before {
+      content: '';
+      position: absolute;
+      width: 16px;
+      height: 16px;
+      left: 3px;
+      top: 3px;
+      background: white;
+      border-radius: 50%;
+      transition: transform .2s;
+    }
+    .switch input:checked + .slider { background: var(--blue) }
+    .switch input:checked + .slider::before { transform: translateX(18px) }
+
+    /* Logo upload area */
+    .logo-drop {
+      border: 1.5px dashed var(--border);
+      border-radius: 10px;
+      padding: 14px;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color .15s;
+      font-size: 12px;
+      color: var(--muted);
+      position: relative;
+      margin-bottom: 8px;
+    }
+    .logo-drop:hover { border-color: var(--blue) }
+    .logo-drop input[type=file] {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      cursor: pointer;
+      width: 100%;
+    }
+    .logo-preview {
+      margin-top: 8px;
+      display: none;
+      align-items: center;
+      gap: 8px;
+    }
+    .logo-preview img {
+      height: 28px;
+      max-width: 100px;
+      object-fit: contain;
+      border-radius: 4px;
+      background: #fff2;
+      padding: 2px 4px;
+    }
+    .logo-clear {
+      background: none;
+      border: none;
+      color: #ff6b6b;
+      font-size: 12px;
+      cursor: pointer;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-family: inherit;
+    }
+    .logo-clear:hover { background: rgba(255,107,107,.1) }
+
+    /* ── Preview pane ── */
+    .preview {
+      padding: 40px 32px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      background: var(--bg);
+      min-height: 100%;
+    }
+    .preview-label {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: .8px;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      width: 100%;
+      max-width: 680px;
+    }
+    .live-dot {
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 6px var(--green);
+      animation: pulse 1.5s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1 }
+      50% { opacity: .4 }
+    }
+    #ev-savings-widget { width: 100%; max-width: 680px }
+
+    /* ── Code modal ── */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.7);
+      backdrop-filter: blur(4px);
+      z-index: 200;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+    .modal-overlay.open { display: flex }
+    .modal {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 28px;
+      max-width: 640px;
+      width: 100%;
+    }
+    .modal-title {
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .modal-close {
+      background: none;
+      border: none;
+      color: var(--muted);
+      font-size: 20px;
+      cursor: pointer;
+      line-height: 1;
+      padding: 0 4px;
+    }
+    .modal-close:hover { color: var(--text) }
+    .code-block {
+      background: #0a0d14;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 18px;
+      font-family: 'Courier New', monospace;
+      font-size: 12.5px;
+      line-height: 1.7;
+      overflow-x: auto;
+      white-space: pre;
+      color: #ccc;
+      margin-bottom: 14px;
+    }
+    .kw  { color: var(--blue) }
+    .att { color: #f7c948 }
+    .val { color: var(--green) }
+    .modal-copy-btn {
+      background: var(--blue);
+      color: #000;
+      border: none;
+      border-radius: 8px;
+      padding: 10px 20px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      width: 100%;
+    }
+    .modal-copy-btn:hover { opacity: .85 }
+
+    @media (max-width: 700px) {
+      .layout { grid-template-columns: 1fr }
+      .settings { position: static; max-height: none }
+      .topbar-hint { display: none }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top bar -->
+  <div class="topbar">
+    <div class="topbar-left">
+      <div class="logo">
+        <svg width="20" height="20" viewBox="0 0 32 32" fill="none">
+          <circle cx="16" cy="16" r="14.5" stroke="#00D4FF" stroke-width="2"/>
+          <path d="M5 19h22" stroke="#7CFF6B" stroke-width="2" stroke-linecap="round"/>
+          <path d="M10 19c0-5 2.6-8.5 6-8.5s6 3.5 6 8.5" stroke="#00D4FF" stroke-width="2" stroke-linecap="round"/>
+          <path d="M14.2 10.2L17 13l-2.4 1.4 3.2 3.2" stroke="#F5F7FA" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <span><span class="logo-ev">EV</span> Horizon Widget</span>
+      </div>
+      <span class="badge">Live Configurator</span>
+    </div>
+    <span class="topbar-hint">← Adjust settings, see changes instantly</span>
+    <button class="btn-copy" onclick="showCode()">Get Embed Code</button>
+  </div>
+
+  <!-- Layout -->
+  <div class="layout">
+
+    <!-- Settings panel -->
+    <aside class="settings">
+      <div class="settings-title">Widget Settings</div>
+
+      <!-- Branding -->
+      <div class="setting-group">
+        <div class="group-label">Branding</div>
+
+        <div class="field">
+          <label class="lbl" for="cfg-dealer">Dealership Name</label>
+          <input type="text" id="cfg-dealer" value="Tesla of Manhattan">
+        </div>
+
+        <div class="field">
+          <label class="lbl" for="cfg-model">EV Model Name</label>
+          <input type="text" id="cfg-model" value="Model 3">
+        </div>
+
+        <div class="field">
+          <label class="lbl">Brand Color</label>
+          <div class="color-row">
+            <input type="color" id="cfg-color-picker" value="#00D4FF">
+            <input type="text" id="cfg-color-hex" class="color-hex" value="#00D4FF" maxlength="7" placeholder="#00D4FF">
+          </div>
+          <div class="color-presets" id="color-presets">
+            <div class="preset-swatch active" data-color="#00D4FF" style="background:#00D4FF" title="EV Blue"></div>
+            <div class="preset-swatch" data-color="#cc0000" style="background:#cc0000" title="Tesla Red"></div>
+            <div class="preset-swatch" data-color="#7CFF6B" style="background:#7CFF6B" title="Eco Green"></div>
+            <div class="preset-swatch" data-color="#f0c040" style="background:#f0c040" title="BYD Yellow"></div>
+            <div class="preset-swatch" data-color="#a855f7" style="background:#a855f7" title="Purple"></div>
+            <div class="preset-swatch" data-color="#f97316" style="background:#f97316" title="Orange"></div>
+            <div class="preset-swatch" data-color="#ffffff" style="background:#ffffff;border:1px solid #333" title="White"></div>
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="lbl">Logo</label>
+          <div class="logo-drop" id="logo-drop">
+            <input type="file" id="cfg-logo-file" accept="image/*">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="margin:0 auto 6px;display:block;opacity:.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            Click or drag to upload logo
+          </div>
+          <div class="logo-preview" id="logo-preview">
+            <img id="logo-preview-img" src="" alt="Logo preview">
+            <button class="logo-clear" onclick="clearLogo()">✕ Remove</button>
+          </div>
+          <div style="font-size:11px;color:var(--muted);margin-top:4px">PNG or SVG recommended · max 120px wide</div>
+        </div>
+      </div>
+
+      <!-- Calculator -->
+      <div class="setting-group">
+        <div class="group-label">Calculator</div>
+
+        <div class="field">
+          <label class="lbl">Default Units</label>
+          <div class="unit-toggle">
+            <button class="unit-btn" id="unit-km" onclick="setUnit('km')">km · L</button>
+            <button class="unit-btn active" id="unit-mi" onclick="setUnit('mi')">miles · gal</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- AI -->
+      <div class="setting-group">
+        <div class="group-label">AI EV Match</div>
+        <div style="font-size:12px;color:var(--muted);line-height:1.6;margin-bottom:12px">
+          The <strong style="color:var(--text)">✨ Find My Best EV Match</strong> button calls a Netlify serverless function → Claude AI → returns personalised EV recommendations.<br><br>
+          To test locally, set <code style="background:#111622;color:#00D4FF;padding:1px 5px;border-radius:3px;font-size:11px">ANTHROPIC_API_KEY</code> in Netlify environment variables. On this demo page it shows the live button — on deploy it will call the real function.
+        </div>
+        <div style="background:#7CFF6B12;border:1px solid #7CFF6B30;border-radius:8px;padding:10px 12px;font-size:12px;color:#7CFF6B">
+          ✓ Lead payload now includes <strong>ai_recommended</strong> field — dealers see which EV the AI matched before the customer submitted.
+        </div>
+      </div>
+
+      <!-- Lead form -->
+      <div class="setting-group">
+        <div class="group-label">Lead Capture</div>
+
+        <div class="field">
+          <div class="toggle-row">
+            <div>
+              <div class="toggle-label">Show contact form</div>
+              <div class="toggle-sub">Collect name, email, phone</div>
+            </div>
+            <label class="switch">
+              <input type="checkbox" id="cfg-show-lead" checked onchange="update()">
+              <span class="slider"></span>
+            </label>
+          </div>
+        </div>
+
+        <div class="field" id="cta-field">
+          <label class="lbl" for="cfg-cta">Button Label</label>
+          <input type="text" id="cfg-cta" value="Book a Test Drive">
+        </div>
+
+        <div class="field" id="webhook-field">
+          <label class="lbl" for="cfg-webhook">Webhook URL <span style="color:var(--muted);font-weight:400">(Zapier / Make)</span></label>
+          <input type="url" id="cfg-webhook" placeholder="https://hooks.zapier.com/…">
+          <div style="font-size:11px;color:var(--muted);margin-top:4px">Leave blank to preview the form layout</div>
+        </div>
+      </div>
+
+    </aside>
+
+    <!-- Preview -->
+    <main class="preview">
+      <div class="preview-label">
+        <span class="live-dot"></span>
+        Live preview — updating as you type
+      </div>
+      <div id="ev-savings-widget"></div>
+    </main>
+
+  </div>
+
+  <!-- Code modal -->
+  <div class="modal-overlay" id="code-modal" onclick="if(event.target===this)closeCode()">
+    <div class="modal">
+      <div class="modal-title">
+        Your Embed Code
+        <button class="modal-close" onclick="closeCode()">×</button>
+      </div>
+      <div class="code-block" id="code-output"></div>
+      <button class="modal-copy-btn" id="copy-btn" onclick="copyCode()">Copy to Clipboard</button>
+    </div>
+  </div>
+
+  <!-- Widget script -->
+  <script src="./widget.js" data-target="ev-savings-widget"></script>
+
+  <script>
+    /* ── State ── */
+    var state = {
+      dealer:   'Tesla of Manhattan',
+      color:    '#00D4FF',
+      model:    'Model 3',
+      logo:     '',
+      unit:     'mi',
+      showLead: true,
+      cta:      'Book a Test Drive',
+      webhook:  '',
+    };
+
+    /* ── Debounced update ── */
+    var updateTimer;
+    function update() {
+      clearTimeout(updateTimer);
+      updateTimer = setTimeout(applyConfig, 80);
+    }
+
+    function applyConfig() {
+      state.dealer   = document.getElementById('cfg-dealer').value   || 'Your Dealership';
+      state.model    = document.getElementById('cfg-model').value;
+      state.color    = document.getElementById('cfg-color-hex').value || '#00D4FF';
+      state.showLead = document.getElementById('cfg-show-lead').checked;
+      state.cta      = document.getElementById('cfg-cta').value      || 'Get a Quote';
+      state.webhook  = document.getElementById('cfg-webhook').value;
+
+      // toggle CTA / webhook fields visibility
+      var visible = state.showLead;
+      document.getElementById('cta-field').style.opacity    = visible ? '1' : '.4';
+      document.getElementById('webhook-field').style.opacity = visible ? '1' : '.4';
+
+      window.EVWidget.init({
+        dealer:   state.dealer,
+        color:    state.color,
+        model:    state.model,
+        logo:     state.logo,
+        unit:     state.unit,
+        showLead: state.showLead,
+        cta:      state.cta,
+        webhook:  state.webhook,
+        target:   'ev-savings-widget',
+      });
+    }
+
+    /* ── Color sync ── */
+    var colorPicker = document.getElementById('cfg-color-picker');
+    var colorHex    = document.getElementById('cfg-color-hex');
+
+    colorPicker.addEventListener('input', function() {
+      colorHex.value = colorPicker.value;
+      syncPresets(colorPicker.value);
+      update();
+    });
+
+    colorHex.addEventListener('input', function() {
+      var v = colorHex.value;
+      if (/^#[0-9A-Fa-f]{6}$/.test(v)) {
+        colorPicker.value = v;
+        syncPresets(v);
+        update();
+      }
+    });
+
+    document.getElementById('color-presets').addEventListener('click', function(e) {
+      var sw = e.target.closest('.preset-swatch');
+      if (!sw) return;
+      var c = sw.getAttribute('data-color');
+      colorPicker.value = c;
+      colorHex.value    = c;
+      syncPresets(c);
+      update();
+    });
+
+    function syncPresets(color) {
+      document.querySelectorAll('.preset-swatch').forEach(function(s) {
+        s.classList.toggle('active', s.getAttribute('data-color').toLowerCase() === color.toLowerCase());
+      });
+    }
+
+    /* ── Unit toggle ── */
+    function setUnit(u) {
+      state.unit = u;
+      document.getElementById('unit-km').classList.toggle('active', u === 'km');
+      document.getElementById('unit-mi').classList.toggle('active', u === 'mi');
+      applyConfig();
+    }
+    // init to mi
+    setUnit('mi');
+
+    /* ── Logo upload ── */
+    var logoDataUrl = '';
+
+    document.getElementById('cfg-logo-file').addEventListener('change', function(e) {
+      var file = e.target.files[0];
+      if (!file) return;
+      var reader = new FileReader();
+      reader.onload = function(ev) {
+        logoDataUrl = ev.target.result;
+        state.logo  = logoDataUrl;
+        document.getElementById('logo-preview-img').src = logoDataUrl;
+        document.getElementById('logo-preview').style.display = 'flex';
+        applyConfig();
+      };
+      reader.readAsDataURL(file);
+    });
+
+    function clearLogo() {
+      logoDataUrl = '';
+      state.logo  = '';
+      document.getElementById('logo-preview').style.display = 'none';
+      document.getElementById('logo-preview-img').src = '';
+      document.getElementById('cfg-logo-file').value = '';
+      applyConfig();
+    }
+
+    /* ── Drag-and-drop logo ── */
+    var dropZone = document.getElementById('logo-drop');
+    dropZone.addEventListener('dragover', function(e) { e.preventDefault(); dropZone.style.borderColor = 'var(--blue)' });
+    dropZone.addEventListener('dragleave', function() { dropZone.style.borderColor = '' });
+    dropZone.addEventListener('drop', function(e) {
+      e.preventDefault();
+      dropZone.style.borderColor = '';
+      var file = e.dataTransfer.files[0];
+      if (!file || !file.type.startsWith('image/')) return;
+      var reader = new FileReader();
+      reader.onload = function(ev) {
+        logoDataUrl = ev.target.result;
+        state.logo  = logoDataUrl;
+        document.getElementById('logo-preview-img').src = logoDataUrl;
+        document.getElementById('logo-preview').style.display = 'flex';
+        applyConfig();
+      };
+      reader.readAsDataURL(file);
+    });
+
+    /* ── Live input listeners ── */
+    ['cfg-dealer','cfg-model','cfg-cta','cfg-webhook'].forEach(function(id) {
+      document.getElementById(id).addEventListener('input', update);
+    });
+
+    /* ── Embed code modal ── */
+    function showCode() {
+      var lines = [
+        '<div id="ev-savings-widget"></div>',
+        '<script',
+        '  src="https://evhorizon.media/widget.js"',
+        '  data-dealer="' + state.dealer.replace(/"/g,'&quot;') + '"',
+        '  data-color="'  + state.color  + '"',
+        '  data-unit="'   + state.unit   + '"',
+      ];
+      if (state.model)    lines.push('  data-model="'    + state.model.replace(/"/g,'&quot;')    + '"');
+      if (state.logo && !state.logo.startsWith('data:')) lines.push('  data-logo="' + state.logo + '"');
+      lines.push('  data-show-lead="' + state.showLead + '"');
+      if (state.showLead) lines.push('  data-cta="' + state.cta.replace(/"/g,'&quot;') + '"');
+      if (state.webhook)  lines.push('  data-webhook="' + state.webhook + '"');
+      lines.push('  defer>');
+      lines.push('<\/script>');
+
+      // syntax highlight
+      var html = lines.map(function(line, i) {
+        if (i === 0) return '<span class="kw">' + line + '</span>';
+        if (i === 1) return '<span class="kw">' + line + '</span>';
+        if (line.startsWith('  data-') || line.startsWith('  src=')) {
+          return line.replace(/(data-[\w-]+|src)(=)(".*?")/g,
+            '<span class="att">$1</span>$2<span class="val">$3</span>');
+        }
+        if (line === '  defer>' || line.startsWith('</')) return '<span class="kw">' + line + '</span>';
+        return line;
+      }).join('\n');
+
+      document.getElementById('code-output').innerHTML = html;
+      document.getElementById('code-modal').classList.add('open');
+    }
+
+    function closeCode() {
+      document.getElementById('code-modal').classList.remove('open');
+    }
+
+    function copyCode() {
+      var raw = document.getElementById('code-output').innerText;
+      navigator.clipboard.writeText(raw).then(function() {
+        var btn = document.getElementById('copy-btn');
+        btn.textContent = '✓ Copied!';
+        setTimeout(function() { btn.textContent = 'Copy to Clipboard'; }, 2000);
+      });
+    }
+
+    /* ── Init ── */
+    applyConfig();
+  </script>
+</body>
+</html>

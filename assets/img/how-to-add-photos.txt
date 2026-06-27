@@ -1,0 +1,26 @@
+HOW TO ADD REAL CAR PHOTOS
+==========================
+
+1. Get a photo you are allowed to use:
+   - Manufacturer press/media sites (editorial use):
+       Tesla:   tesla.com/press
+       BYD:     byd.com → News/Press
+       Hyundai: hyundai.news · Kia: press.kia.com · Rivian: rivian.com/newsroom
+   - Free stock with license included: unsplash.com, pexels.com
+     (search "Tesla Model 3", "BYD Seal", "EV charging" etc.)
+
+2. Name the file after the article slug and drop it in this folder:
+       tesla-vs-byd-who-is-winning-the-ev-race.jpg
+       best-electric-suvs.jpg
+       ev-charging-explained.jpg
+   (jpg, jpeg, png, webp or avif all work — aim for ~1600px wide, under 300 KB)
+
+3. Rebuild the site:
+       cd _build && node generate.js
+
+That's it. Cards, the featured story and the article page automatically use the
+photo; articles without a photo keep their generated artwork.
+
+Optional, per article (in _build/content/<article>.js):
+   imageAlt:    'White Tesla Model 3 and blue BYD Seal parked side by side',
+   imageCredit: 'Photo: Tesla, Inc. press kit',

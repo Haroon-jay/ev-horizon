@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EV Savings Widget for Dealerships — EV Horizon</title>
+  <meta name="description" content="Add an EV savings calculator to your dealership website in two lines of code. Capture leads automatically. $99/month.">
+  <link rel="canonical" href="https://www.evhorizon.media/widget/">
+  <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0 }
+    :root {
+      --bg: #05070A;
+      --bg2: #0e1219;
+      --border: #1e2430;
+      --text: #f0f2f5;
+      --muted: #8892a4;
+      --green: #7CFF6B;
+      --blue: #00D4FF;
+    }
+    html { scroll-behavior: smooth }
+    body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; line-height: 1.6 }
+    a { color: var(--blue); text-decoration: none }
+    a:hover { opacity: .8 }
+
+    /* ── Layout ── */
+    .container { max-width: 1060px; margin: 0 auto; padding: 0 24px }
+    .section { padding: 80px 0 }
+    .section--sm { padding: 48px 0 }
+
+    /* ── Nav ── */
+    nav.top { padding: 18px 0; border-bottom: 1px solid var(--border); position: sticky; top: 0;
+              background: var(--bg)ee; backdrop-filter: blur(12px); z-index: 100 }
+    nav.top .inner { display: flex; align-items: center; justify-content: space-between }
+    .logo { display: flex; align-items: center; gap: 8px; font-family: 'Space Grotesk', sans-serif;
+            font-weight: 700; font-size: 17px; color: var(--text) }
+    .logo-ev { color: var(--blue) }
+    .nav-links { display: flex; gap: 28px; font-size: 14px }
+    .nav-links a { color: var(--muted) }
+    .nav-links a:hover { color: var(--text) }
+    .btn { display: inline-flex; align-items: center; gap: 6px; padding: 11px 22px;
+           border-radius: 10px; font-size: 14px; font-weight: 600; cursor: pointer;
+           border: none; transition: opacity .15s; line-height: 1 }
+    .btn-primary { background: var(--blue); color: #000 }
+    .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text) }
+    .btn:hover { opacity: .85 }
+
+    /* ── Hero ── */
+    .hero { padding: 96px 0 80px; text-align: center }
+    .hero-badge { display: inline-flex; align-items: center; gap: 6px; background: var(--blue)15;
+                  border: 1px solid var(--blue)40; border-radius: 99px; padding: 5px 14px;
+                  font-size: 12px; font-weight: 600; color: var(--blue); margin-bottom: 24px }
+    .hero h1 { font-family: 'Space Grotesk', sans-serif; font-size: clamp(32px,5vw,56px);
+               font-weight: 700; line-height: 1.1; max-width: 700px; margin: 0 auto 20px }
+    .hero h1 span { color: var(--blue) }
+    .hero p { font-size: 18px; color: var(--muted); max-width: 520px; margin: 0 auto 36px }
+    .hero-ctas { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap }
+    .hero-note { margin-top: 16px; font-size: 13px; color: var(--muted) }
+
+    /* ── Live demo ── */
+    .demo-wrap { background: var(--bg2); border: 1px solid var(--border); border-radius: 20px;
+                 overflow: hidden; max-width: 680px; margin: 0 auto }
+    .demo-bar { background: #0a0d14; padding: 10px 16px; display: flex; gap: 7px; align-items: center;
+                border-bottom: 1px solid var(--border) }
+    .dot { width: 11px; height: 11px; border-radius: 50%; background: var(--border) }
+    .dot.r { background: #ff5f57 } .dot.y { background: #febc2e } .dot.g { background: #28c840 }
+    .demo-url { font-size: 12px; color: var(--muted); margin-left: 8px }
+    .demo-inner { padding: 24px }
+
+    /* ── Features ── */
+    .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px,1fr)); gap: 24px }
+    .feat { background: var(--bg2); border: 1px solid var(--border); border-radius: 16px; padding: 24px }
+    .feat-icon { font-size: 24px; margin-bottom: 12px }
+    .feat h3 { font-size: 16px; font-weight: 600; margin-bottom: 8px }
+    .feat p { font-size: 14px; color: var(--muted); line-height: 1.6 }
+
+    /* ── Code snippet ── */
+    .code-block { background: var(--bg2); border: 1px solid var(--border); border-radius: 14px;
+                  padding: 24px; font-family: 'Courier New', monospace; font-size: 13px;
+                  line-height: 1.7; overflow-x: auto; position: relative }
+    .code-block .kw { color: var(--blue) }
+    .code-block .attr { color: #f7c948 }
+    .code-block .val { color: var(--green) }
+    .code-copy { position: absolute; top: 12px; right: 12px; background: var(--border);
+                 border: none; border-radius: 7px; padding: 6px 12px; color: var(--muted);
+                 font-size: 12px; cursor: pointer; font-family: inherit }
+    .code-copy:hover { color: var(--text) }
+
+    /* ── How it works ── */
+    .steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px,1fr)); gap: 24px }
+    .step { text-align: center; padding: 24px }
+    .step-num { width: 44px; height: 44px; border-radius: 50%; background: var(--blue)15;
+                border: 1px solid var(--blue)40; color: var(--blue); font-weight: 700; font-size: 18px;
+                display: flex; align-items: center; justify-content: center; margin: 0 auto 16px }
+    .step h3 { font-size: 16px; font-weight: 600; margin-bottom: 8px }
+    .step p { font-size: 14px; color: var(--muted) }
+
+    /* ── Pricing ── */
+    .pricing-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px,1fr)); gap: 24px; max-width: 820px; margin: 0 auto }
+    .plan { background: var(--bg2); border: 1px solid var(--border); border-radius: 20px; padding: 28px }
+    .plan.featured { border-color: var(--blue); background: linear-gradient(135deg,#0a1422 0%,var(--bg2) 100%) }
+    .plan-badge { display: inline-block; background: var(--blue); color: #000; font-size: 11px;
+                  font-weight: 700; padding: 3px 10px; border-radius: 99px; margin-bottom: 12px }
+    .plan h3 { font-size: 18px; font-weight: 700; margin-bottom: 4px }
+    .plan-price { font-family: 'Space Grotesk', sans-serif; font-size: 40px; font-weight: 700;
+                  color: var(--text); line-height: 1.1 }
+    .plan-price span { font-size: 16px; color: var(--muted); font-weight: 400 }
+    .plan-desc { font-size: 13px; color: var(--muted); margin: 8px 0 20px }
+    .plan-features { list-style: none; margin-bottom: 24px }
+    .plan-features li { font-size: 14px; padding: 7px 0; border-bottom: 1px solid var(--border)60;
+                        display: flex; gap: 10px }
+    .plan-features li:last-child { border-bottom: none }
+    .plan-features li::before { content: '✓'; color: var(--green); font-weight: 700; flex-shrink: 0 }
+
+    /* ── Signup form ── */
+    .signup-wrap { background: var(--bg2); border: 1px solid var(--border); border-radius: 20px;
+                   padding: 40px; max-width: 560px; margin: 0 auto; text-align: center }
+    .signup-wrap h2 { font-size: 26px; font-weight: 700; margin-bottom: 8px }
+    .signup-wrap p { color: var(--muted); font-size: 15px; margin-bottom: 28px }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px }
+    .inp { width: 100%; background: #111622; border: 1px solid var(--border); border-radius: 10px;
+           padding: 12px 14px; color: var(--text); font-size: 14px; outline: none; font-family: inherit }
+    .inp:focus { border-color: var(--blue) }
+    .signup-note { font-size: 12px; color: var(--muted); margin-top: 12px }
+    .signup-success { color: var(--green); font-size: 15px; margin-top: 16px; display: none }
+    .signup-err { color: #ff6b6b; font-size: 13px; margin-top: 8px; display: none }
+
+    /* ── Footer ── */
+    footer { border-top: 1px solid var(--border); padding: 32px 0; text-align: center;
+             font-size: 13px; color: var(--muted) }
+    footer a { color: var(--muted) }
+
+    /* ── Section headers ── */
+    .section-label { font-size: 12px; font-weight: 600; letter-spacing: .8px; text-transform: uppercase;
+                     color: var(--blue); margin-bottom: 12px }
+    .section-title { font-family: 'Space Grotesk', sans-serif; font-size: clamp(26px,3.5vw,40px);
+                     font-weight: 700; margin-bottom: 16px }
+    .section-sub { font-size: 16px; color: var(--muted); max-width: 540px }
+
+    @media (max-width: 600px) {
+      .form-row { grid-template-columns: 1fr }
+      .nav-links { display: none }
+      .hero { padding: 60px 0 48px }
+      .section { padding: 56px 0 }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Nav -->
+  <nav class="top">
+    <div class="container inner">
+      <a class="logo" href="../index.html">
+        <svg width="22" height="22" viewBox="0 0 32 32" fill="none">
+          <circle cx="16" cy="16" r="14.5" stroke="#00D4FF" stroke-width="2"/>
+          <path d="M5 19h22" stroke="#7CFF6B" stroke-width="2" stroke-linecap="round"/>
+          <path d="M10 19c0-5 2.6-8.5 6-8.5s6 3.5 6 8.5" stroke="#00D4FF" stroke-width="2" stroke-linecap="round"/>
+          <path d="M14.2 10.2L17 13l-2.4 1.4 3.2 3.2" stroke="#F5F7FA" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <span><span class="logo-ev">EV</span> Horizon</span>
+      </a>
+      <div class="nav-links">
+        <a href="#demo">Live Demo</a>
+        <a href="#how-it-works">How it Works</a>
+        <a href="#pricing">Pricing</a>
+        <a href="../index.html">EV Horizon ↗</a>
+      </div>
+      <a class="btn btn-primary" href="#signup">Get Started</a>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="container">
+      <div class="hero-badge">
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><circle cx="6" cy="6" r="5" stroke="#00D4FF" stroke-width="1.5"/><path d="M4 6l1.5 1.5L8 4" stroke="#00D4FF" stroke-width="1.5" stroke-linecap="round"/></svg>
+        For EV Dealerships
+      </div>
+      <h1>Let customers see their<br><span>EV savings before they ask</span></h1>
+      <p>An embeddable savings calculator that turns curiosity into booked test drives — two lines of code, no dev work.</p>
+      <div class="hero-ctas">
+        <a class="btn btn-primary" href="#signup">Start Free Trial</a>
+        <a class="btn btn-outline" href="#demo">See Live Demo</a>
+      </div>
+      <p class="hero-note">No credit card required · 14-day free trial · Cancel anytime</p>
+    </div>
+  </section>
+
+  <!-- Live demo -->
+  <section class="section--sm" id="demo">
+    <div class="container">
+      <div style="text-align:center;margin-bottom:32px">
+        <p class="section-label">Live Demo</p>
+        <h2 class="section-title">This is what your customers see</h2>
+        <p class="section-sub" style="margin:0 auto">Embedded directly on your site — styled with your brand color. Try it.</p>
+      </div>
+      <div class="demo-wrap">
+        <div class="demo-bar">
+          <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
+          <span class="demo-url">yourdealership.com/ev-models</span>
+        </div>
+        <div class="demo-inner">
+          <div id="ev-savings-widget"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features -->
+  <section class="section">
+    <div class="container">
+      <div style="text-align:center;margin-bottom:48px">
+        <p class="section-label">Features</p>
+        <h2 class="section-title">Everything you need, nothing you don't</h2>
+      </div>
+      <div class="features-grid">
+        <div class="feat">
+          <div class="feat-icon">⚡</div>
+          <h3>Two-line embed</h3>
+          <p>A div and a script tag. No npm, no build step, no developer required. Works on any website including WordPress, Wix, Squarespace, and custom HTML.</p>
+        </div>
+        <div class="feat">
+          <div class="feat-icon">🎨</div>
+          <h3>Brand-matched styling</h3>
+          <p>Set your brand color with one attribute. The widget auto-adapts — no CSS overrides needed. Your logo or dealer name appears in the header.</p>
+        </div>
+        <div class="feat">
+          <div class="feat-icon">📬</div>
+          <h3>Automatic lead capture</h3>
+          <p>After a customer sees their savings, a "Book a Test Drive" form appears. Leads are posted to your webhook (Zapier, Make, your CRM) with full calc context.</p>
+        </div>
+        <div class="feat">
+          <div class="feat-icon">🌍</div>
+          <h3>km & miles, any currency</h3>
+          <p>Customers toggle between metric and imperial. All inputs use real-world defaults that make sense — no confusion, no wrong answers.</p>
+        </div>
+        <div class="feat">
+          <div class="feat-icon">📱</div>
+          <h3>Fully responsive</h3>
+          <p>Works on mobile, tablet, and desktop without any configuration. Single-column layout on small screens automatically.</p>
+        </div>
+        <div class="feat">
+          <div class="feat-icon">🔒</div>
+          <h3>Privacy-friendly</h3>
+          <p>No cookies, no tracking pixels, no third-party scripts. Calculations run entirely in the browser — nothing is sent to our servers unless a lead submits.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- How it works -->
+  <section class="section" id="how-it-works" style="background:var(--bg2);border-top:1px solid var(--border);border-bottom:1px solid var(--border)">
+    <div class="container">
+      <div style="text-align:center;margin-bottom:48px">
+        <p class="section-label">How it works</p>
+        <h2 class="section-title">Up and running in 5 minutes</h2>
+      </div>
+      <div class="steps">
+        <div class="step">
+          <div class="step-num">1</div>
+          <h3>Sign up</h3>
+          <p>Create your account and get your API key and embed code instantly.</p>
+        </div>
+        <div class="step">
+          <div class="step-num">2</div>
+          <h3>Paste two lines</h3>
+          <p>Add the div and script tag to any page on your site. Set your brand color, dealer name, and CTA text via attributes.</p>
+        </div>
+        <div class="step">
+          <div class="step-num">3</div>
+          <h3>Connect your CRM</h3>
+          <p>Paste your Zapier or Make webhook URL. Every lead arrives with name, email, phone, and the savings numbers they calculated.</p>
+        </div>
+        <div class="step">
+          <div class="step-num">4</div>
+          <h3>Get leads</h3>
+          <p>Customers who've already calculated their savings are warm leads — they know the numbers and they're curious. You just show up for the test drive.</p>
+        </div>
+      </div>
+
+      <!-- Code snippet -->
+      <div style="max-width:680px;margin:48px auto 0">
+        <p style="font-size:13px;color:var(--muted);margin-bottom:12px">Your embed code (customise the attributes):</p>
+        <div class="code-block" id="code-snippet">
+          <button class="code-copy" onclick="copyCode()">Copy</button>
+<span class="kw">&lt;div</span> <span class="attr">id</span>=<span class="val">"ev-savings-widget"</span><span class="kw">&gt;&lt;/div&gt;</span>
+<span class="kw">&lt;script</span>
+  <span class="attr">src</span>=<span class="val">"https://evhorizon.media/widget.js"</span>
+  <span class="attr">data-dealer</span>=<span class="val">"Your Dealership Name"</span>
+  <span class="attr">data-color</span>=<span class="val">"#00D4FF"</span>
+  <span class="attr">data-unit</span>=<span class="val">"mi"</span>
+  <span class="attr">data-model</span>=<span class="val">"Model 3"</span>
+  <span class="attr">data-webhook</span>=<span class="val">"https://hooks.zapier.com/YOUR_HOOK"</span>
+  <span class="attr">data-cta</span>=<span class="val">"Book a Test Drive"</span>
+  <span class="attr">defer</span><span class="kw">&gt;</span>
+<span class="kw">&lt;/script&gt;</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Pricing -->
+  <section class="section" id="pricing">
+    <div class="container">
+      <div style="text-align:center;margin-bottom:48px">
+        <p class="section-label">Pricing</p>
+        <h2 class="section-title">Simple, honest pricing</h2>
+        <p class="section-sub" style="margin:0 auto">One lead that converts pays for months. No usage caps, no per-lead fees.</p>
+      </div>
+      <div class="pricing-grid">
+        <div class="plan">
+          <h3>Starter</h3>
+          <div class="plan-price">$99<span>/mo</span></div>
+          <p class="plan-desc">One site, all the basics.</p>
+          <ul class="plan-features">
+            <li>1 dealership / domain</li>
+            <li>Unlimited calculator interactions</li>
+            <li>Lead capture form</li>
+            <li>1 webhook integration</li>
+            <li>Brand color + dealer name</li>
+            <li>Email support</li>
+          </ul>
+          <a class="btn btn-outline" href="#signup" style="width:100%;justify-content:center">Start free trial</a>
+        </div>
+        <div class="plan featured">
+          <div class="plan-badge">Most popular</div>
+          <h3>Pro</h3>
+          <div class="plan-price">$249<span>/mo</span></div>
+          <p class="plan-desc">Groups, multi-location dealers.</p>
+          <ul class="plan-features">
+            <li>Up to 5 sites / domains</li>
+            <li>Unlimited calculator interactions</li>
+            <li>Lead capture form</li>
+            <li>Unlimited webhook integrations</li>
+            <li>Full brand customisation</li>
+            <li>Lead dashboard (coming soon)</li>
+            <li>Priority support</li>
+          </ul>
+          <a class="btn btn-primary" href="#signup" style="width:100%;justify-content:center">Start free trial</a>
+        </div>
+        <div class="plan">
+          <h3>White-label</h3>
+          <div class="plan-price" style="font-size:28px;padding-top:6px">Let's talk</div>
+          <p class="plan-desc">OEM, large groups, or you want to resell.</p>
+          <ul class="plan-features">
+            <li>Remove "EV Horizon" branding</li>
+            <li>Custom domain serving</li>
+            <li>Unlimited sites</li>
+            <li>Custom tool configurations</li>
+            <li>SLA + dedicated support</li>
+          </ul>
+          <a class="btn btn-outline" href="mailto:hello@evhorizon.media?subject=White-label%20Widget" style="width:100%;justify-content:center">Contact us</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Sign up -->
+  <section class="section" id="signup">
+    <div class="container">
+      <div class="signup-wrap">
+        <h2>Start your free trial</h2>
+        <p>14 days free, no card required. Setup takes 5 minutes.</p>
+        <form id="signup-form">
+          <div class="form-row">
+            <input class="inp" id="su-name" type="text" placeholder="Your name" required autocomplete="name">
+            <input class="inp" id="su-dealer" type="text" placeholder="Dealership name" required>
+          </div>
+          <input class="inp" id="su-email" type="email" placeholder="Work email" required autocomplete="email" style="margin-bottom:12px">
+          <input class="inp" id="su-url" type="url" placeholder="Your website URL" style="margin-bottom:14px">
+          <button class="btn btn-primary" type="submit" style="width:100%;justify-content:center;padding:14px">Start Free Trial</button>
+          <p class="signup-err" id="su-err">Please fill in all required fields.</p>
+          <p class="signup-success" id="su-ok">✓ You're on the list! We'll be in touch within one business day to get you set up.</p>
+          <p class="signup-note">By signing up you agree to be contacted by EV Horizon. No spam.</p>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="container">
+      <p>© 2026 <a href="../index.html">EV Horizon</a> · <a href="../privacy/">Privacy</a> · <a href="mailto:hello@evhorizon.media">hello@evhorizon.media</a></p>
+    </div>
+  </footer>
+
+  <!-- Live demo widget -->
+  <script
+    src="../widget.js"
+    data-dealer="Demo Dealership"
+    data-color="#00D4FF"
+    data-unit="mi"
+    data-model="any EV"
+    data-cta="Book a Test Drive">
+  </script>
+
+  <script>
+    // Copy code
+    function copyCode() {
+      var code = document.getElementById('code-snippet');
+      var text = code.innerText.replace('Copy\n','');
+      navigator.clipboard.writeText(text).then(function() {
+        var btn = code.querySelector('.code-copy');
+        btn.textContent = 'Copied!';
+        setTimeout(function(){ btn.textContent = 'Copy'; }, 2000);
+      });
+    }
+
+    // Sign-up form → Formspree (replace with your own endpoint)
+    document.getElementById('signup-form').addEventListener('submit', function(e) {
+      e.preventDefault();
+      var name   = document.getElementById('su-name').value.trim();
+      var dealer = document.getElementById('su-dealer').value.trim();
+      var email  = document.getElementById('su-email').value.trim();
+      var err    = document.getElementById('su-err');
+      var ok     = document.getElementById('su-ok');
+
+      if (!name || !dealer || !email || !email.includes('@')) {
+        err.style.display = 'block'; return;
+      }
+      err.style.display = 'none';
+
+      var btn = this.querySelector('button[type=submit]');
+      btn.disabled = true; btn.textContent = 'Sending…';
+
+      // Replace with your Formspree / backend endpoint
+      var FORM_ENDPOINT = 'https://formspree.io/f/YOUR_FORM_ID';
+
+      fetch(FORM_ENDPOINT, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        body: JSON.stringify({
+          name: name, dealer: dealer, email: email,
+          url: document.getElementById('su-url').value.trim(),
+          plan: 'trial', source: 'widget-landing'
+        })
+      }).then(function(r) {
+        if (!r.ok) throw new Error();
+        ok.style.display = 'block';
+        btn.style.display = 'none';
+      }).catch(function() {
+        btn.disabled = false; btn.textContent = 'Start Free Trial';
+        err.textContent = 'Something went wrong — email us at hello@evhorizon.media';
+        err.style.display = 'block';
+      });
+    });
+  </script>
+</body>
+</html>
