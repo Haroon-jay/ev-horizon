@@ -323,7 +323,7 @@
             <li>Brand color + dealer name</li>
             <li>Email support</li>
           </ul>
-          <a class="btn btn-outline" href="#signup" style="width:100%;justify-content:center">Start free trial</a>
+          <a id="cta-starter" class="btn btn-outline" href="#signup" style="width:100%;justify-content:center">Start free trial</a>
         </div>
         <div class="plan featured">
           <div class="plan-badge">Most popular</div>
@@ -339,7 +339,7 @@
             <li>Lead dashboard (coming soon)</li>
             <li>Priority support</li>
           </ul>
-          <a class="btn btn-primary" href="#signup" style="width:100%;justify-content:center">Start free trial</a>
+          <a id="cta-pro" class="btn btn-primary" href="#signup" style="width:100%;justify-content:center">Start free trial</a>
         </div>
         <div class="plan">
           <h3>White-label</h3>
@@ -446,6 +446,30 @@
         err.style.display = 'block';
       });
     });
+  </script>
+
+  <!-- ───────────────────────────────────────────────────────────────
+       STRIPE PAYMENT LINKS
+       Paste your Stripe Payment Link URLs below (Stripe Dashboard →
+       Payment Links → create one per plan, set as a recurring/subscription
+       price, optional free-trial days). Leave a value empty and that button
+       keeps falling back to the on-page signup form.
+       ─────────────────────────────────────────────────────────────── -->
+  <script>
+    (function () {
+      var STRIPE_LINKS = {
+        starter: '',   // e.g. 'https://buy.stripe.com/xxxxxxxxxxxx'  ($99/mo)
+        pro:     '',   // e.g. 'https://buy.stripe.com/yyyyyyyyyyyy'  ($249/mo)
+      };
+      Object.keys(STRIPE_LINKS).forEach(function (plan) {
+        var url = STRIPE_LINKS[plan];
+        var el = document.getElementById('cta-' + plan);
+        if (el && url) {
+          el.href = url;
+          el.removeAttribute('target'); // same-tab so Stripe's return URL works cleanly
+        }
+      });
+    })();
   </script>
 </body>
 </html>
