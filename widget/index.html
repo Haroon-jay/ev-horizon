@@ -328,7 +328,7 @@
         <div class="plan featured">
           <div class="plan-badge">Most popular</div>
           <h3>Pro</h3>
-          <div class="plan-price">$249<span>/mo</span></div>
+          <div class="plan-price">$200<span>/mo</span></div>
           <p class="plan-desc">Groups, multi-location dealers.</p>
           <ul class="plan-features">
             <li>Up to 5 sites / domains</li>
@@ -458,8 +458,8 @@
   <script>
     (function () {
       var STRIPE_LINKS = {
-        starter: '',   // e.g. 'https://buy.stripe.com/xxxxxxxxxxxx'  ($99/mo)
-        pro:     '',   // e.g. 'https://buy.stripe.com/yyyyyyyyyyyy'  ($249/mo)
+        starter: '',   // add the $99/mo Payment Link here; falls back to signup form until then
+        pro:     'https://buy.stripe.com/aFacN69K05V884casxak000',   // $200/mo subscription link
       };
       Object.keys(STRIPE_LINKS).forEach(function (plan) {
         var url = STRIPE_LINKS[plan];
